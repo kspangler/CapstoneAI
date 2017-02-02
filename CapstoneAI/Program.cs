@@ -192,7 +192,7 @@ namespace CapstoneAI
 
         public Node alphaBeta(Node root, int alpha, int beta, bool max)
         {
-            Node bestMove = root;
+            Node bestMove = root
             if (root.children == null)
                 evaluate(root);
             else if (alpha < beta)
