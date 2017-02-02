@@ -42,7 +42,7 @@ namespace CapstoneAI
             public intNode root = new intNode();
         }
 
-        Node makeChild(Node parent, int space)
+        Node makeChild(Node parent, int space, bool max)
         {
             //a legal move has been detected and will now be a child
             //space is the space on the board the piece will occupy
@@ -53,95 +53,71 @@ namespace CapstoneAI
             child.children = null;
             child.parent = parent;
             parent.children.Add(child);
-            if(child.)
-            if (parent.min)
+            if (max)
             {
-                child.player[space] = true;
+                child.computer[space] = true;
             }
             else
-                child.computer[space] = true;
+                child.player[space] = true;
 
             return child;
         }
 
-        //public Node alphaBeta(Node root, int alpha, int beta, bool max)
-        //{
-        //    Node bestMove = new Node();
-        //    bestMove = root;
-        //    if (root.children != null && alpha < beta)
-        //    {
-        //        if (!max)
-        //        {
-        //            foreach (Node child in root.children)
-        //            {
-        //                if (alphaBeta(child, alpha, beta, true).weight < beta)
-        //                    bestMove = child;
-        //                else
-        //                    break;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            foreach (Node child in root.children)
-        //            {
-        //                if (alphaBeta(child, alpha, beta, false).weight > alpha)
-        //                    bestMove = child;
-        //                else
-        //                    break;
-        //            }
-        //        }
-        //    }
-        //    return bestMove;
-        //}
-
         public int evaluate(Node move, bool [,] adjacent)
         {
-            if (move.children == null)
-            {
-                //if there's a mill, +3, make sure that move is selected
+            int weight = 0;
+                if(mill(move))
                 //if (move.adjacent[i][j] && move.adjacent[j][k])
                 {
-                    move.weight += 3;
+                weight += 3;
                 }
                 //if 2 in a row with no opponent in that row, +2
                 //if (move.adjacent[i][j] && !move.player1[k])
                 //weight more if an opponent cannot block (i.e. 2 in a row, and you can get a mill on next move)
                 {
-                    move.weight += 2;
+                weight += 2;
                 }
                 //if 2 in a row, +1
                 //if (move.adjacent[i][j])
                 {
-                    move.weight += 1;
+                weight += 1;
                 }
                 //# of connections +1 each
                 if (true)
                 { }
-            //blocking opponents mill +2, make sure that's done
+            if(blockedMill)
             //if (opponent has mill && (move.adjacent[i][j] || move.adjacent[j][k]))
                 {
-                    move.weight += 3;
+                weight += 3;
                 }
-                //if (opponent gets mill)
+                if (mill) //pass in opponents bitset instead of CPU's
                 {
-                    move.weight = 0;
+                weight = 0;
                 }
-
-            }
-            else
-            {
-                foreach (Node child in move.children)
-                    evaluate(child, adjacent);
-            }
+            move.weight = weight;
             return move.weight;
         }
 
         bool mill(Node move, bool[,] adjacent)
         {
+            //use adjacency to figure out if there is a mill in the move
             bool isMill = false;
-
-            if(adjacent[move.space])
+            foreach (bool bit in move.computer)
+            {
+                //make arrays for the different mills - there are 16 possible, so you know you will have 16 arrays of 3 ints
+                if(bit && millbit[0] && millbit[1] && millbit[2])
+                    //its a mill
+                    //i.e. 1 is the poential space, so is mill1[0], mill1[1], mill2[2]?
+            }
             return isMill;
+        }
+
+        bool blockedMill(Node move)
+        {
+            bool isBlocked = false;
+            if (//opponent has two spaces adjacent && CPU can place a piece in that row)
+                isBlocked = true;
+            return isBlocked;
         }
 
         bool legalMove(Node from, Node to, bool[,] adjacent)
@@ -150,6 +126,46 @@ namespace CapstoneAI
             if (adjacent[from.space, to.space])
                 legal = true;
             return legal;
+        }
+ 
+        public int alphaBeta(Node root, int alpha, int beta, bool max)
+        {
+            //check time constraint of 6 seconds
+            //if so, return immediately
+            int bestValue = root.weight;
+            if (root.children == null)
+                bestValue = root.weight;
+            if (max)
+            {
+                foreach (Node child in root.children)
+                {
+                    int result = alphaBeta(child, alpha, beta, false);
+                    if (result > alpha)
+                    {
+                        alpha = result;
+                        bestValue = child.weight;
+                    }
+                    if (alpha >= beta)
+                        break;
+                }
+            }
+
+            else
+            {
+                foreach (Node child in root.children)
+                {
+                    int result = alphaBeta(child, alpha, beta, true);
+                    if (result < beta)
+                    {
+                        beta = result;
+                        bestValue = child.weight;
+                    }
+                    if (alpha >= beta)
+                        break;
+                }
+            }
+
+            return bestValue;
         }
 
         int evaluate(intNode number)
@@ -166,7 +182,7 @@ namespace CapstoneAI
                 bestMove = root.value;
             else if (alpha < beta)
             {
-                if(!max)
+                if (!max)
                 {
                     foreach (intNode child in root.children)
                     {
@@ -190,38 +206,6 @@ namespace CapstoneAI
             return bestMove;
         }
 
-        public Node alphaBeta(Node root, int alpha, int beta, bool max)
-        {
-            Node bestMove = root
-            if (root.children == null)
-                evaluate(root);
-            else if (alpha < beta)
-            {
-                if (!max)
-                {
-                    foreach (Node child in root.children)
-                    {
-                        if (alphaBeta(child, alpha, beta, true).weight < beta)
-                            bestMove = child;
-                        else
-                            break;
-                    }
-                }
-                else
-                {
-                    foreach (Node child in root.children)
-                    {
-                        if (alphaBeta(child, alpha, beta, false).weight > alpha)
-                            bestMove = child;
-                        else
-                            break;
-                    }
-                }
-            }
-            //else - what happens if alpha >= beta?
-            return bestMove;
-        }
-
         static void Main(string[] args)
         {
             //make the tree here
@@ -233,43 +217,68 @@ namespace CapstoneAI
             //tree.root.min = true;
             //tree.root.max = false;
 
-            intTree tree = new intTree();
+            Tree tree = new Tree();
 
-            bool[,] adjacent = new bool[25, 25];
+            //bool[,] adjacent = new bool[25, 25];
 
-            adjacent[1, 2] = adjacent[2, 1] = true;
-            adjacent[2, 3] = adjacent[3, 2] = true;
-            adjacent[4, 5] = adjacent[5, 4] = true;
-            adjacent[5, 6] = adjacent[6, 5] = true;
-            adjacent[7, 8] = adjacent[8, 7] = true;
-            adjacent[8, 9] = adjacent[9, 8] = true;
-            adjacent[10, 11] = adjacent[11, 10] = true;
-            adjacent[11, 12] = adjacent[12, 11] = true;
-            adjacent[13, 14] = adjacent[14, 13] = true;
-            adjacent[14, 15] = adjacent[15, 14] = true;
-            adjacent[16, 17] = adjacent[17, 16] = true;
-            adjacent[17, 18] = adjacent[18, 17] = true;
-            adjacent[19, 20] = adjacent[20, 19] = true;
-            adjacent[20, 21] = adjacent[21, 20] = true;
-            adjacent[22, 23] = adjacent[23, 22] = true;
-            adjacent[23, 24] = adjacent[24, 23] = true;
+            int[] adjacent1 = new int[4] { 2, 10, 0, 0 };
+            int[] adjacent2 = new int[4] { 1, 3, 5, 0 };
+            int[] adjacent3 = new int[4] { 2, 15, 0, 0 };
+            int[] adjacent4 = new int[4] { 5, 11, 0, 0 };
+            int[] adjacent5 = new int[4] { 2, 4, 6, 8 };
+            int[] adjacent6 = new int[4] { 5, 14, 0, 0 };
+            int[] adjacent7 = new int[4] { 8, 12, 0, 0 };
+            int[] adjacent8 = new int[4] { 5, 7, 9, 0 };
+            int[] adjacent9 = new int[4] { 8, 13, 0, 0 };
+            int[] adjacent10 = new int[4] { 1, 11, 22, 0 };
+            int[] adjacent11 = new int[4] { 4, 10, 12, 19 };
+            int[] adjacent12 = new int[4] { 7, 11, 16, 0 };
+            int[] adjacent13 = new int[4] { 9, 14, 18, 0 };
+            int[] adjacent14 = new int[4] { 6, 13, 15, 21 };
+            int[] adjacent15 = new int[4] { 3, 14, 24, 0 };
+            int[] adjacent16 = new int[4] { 12, 17, 0, 0 };
+            int[] adjacent17 = new int[4] { 16, 18, 20, 0 };
+            int[] adjacent18 = new int[4] { 13, 17, 0, 0 };
+            int[] adjacent19 = new int[4] { 11, 20, 0, 0 };
+            int[] adjacent20 = new int[4] { 17, 19, 21, 23 };
+            int[] adjacent21 = new int[4] { 14, 20, 0, 0 };
+            int[] adjacent22 = new int[4] { 10, 23, 0, 0 };
+            int[] adjacent23 = new int[4] { 20, 22, 24, 0 };
+            int[] adjacent24 = new int[4] { 15, 23, 0, 0 };
+            
+            //adjacent[1, 2] = adjacent[2, 1] = true;
+            //adjacent[2, 3] = adjacent[3, 2] = true;
+            //adjacent[4, 5] = adjacent[5, 4] = true;
+            //adjacent[5, 6] = adjacent[6, 5] = true;
+            //adjacent[7, 8] = adjacent[8, 7] = true;
+            //adjacent[8, 9] = adjacent[9, 8] = true;
+            //adjacent[10, 11] = adjacent[11, 10] = true;
+            //adjacent[11, 12] = adjacent[12, 11] = true;
+            //adjacent[13, 14] = adjacent[14, 13] = true;
+            //adjacent[14, 15] = adjacent[15, 14] = true;
+            //adjacent[16, 17] = adjacent[17, 16] = true;
+            //adjacent[17, 18] = adjacent[18, 17] = true;
+            //adjacent[19, 20] = adjacent[20, 19] = true;
+            //adjacent[20, 21] = adjacent[21, 20] = true;
+            //adjacent[22, 23] = adjacent[23, 22] = true;
+            //adjacent[23, 24] = adjacent[24, 23] = true;
 
-            adjacent[1, 10] = adjacent[10, 1] = true;
-            adjacent[10, 22] = adjacent[22, 10] = true;
-            adjacent[4, 11] = adjacent[11, 4] = true;
-            adjacent[11, 19] = adjacent[19, 11] = true;
-            adjacent[7, 12] = adjacent[12, 7] = true;
-            adjacent[12, 16] = adjacent[16, 12] = true;
-            adjacent[2, 5] = adjacent[5, 2] = true;
-            adjacent[5, 8] = adjacent[8, 5] = true;
-            adjacent[17, 20] = adjacent[20, 17] = true;
-            adjacent[20, 23] = adjacent[23, 20] = true;
-            adjacent[9, 13] = adjacent[13, 9] = true;
-            adjacent[13, 18] = adjacent[18, 13] = true;
-            adjacent[6, 14] = adjacent[14, 6] = true;
-            adjacent[14, 21] = adjacent[21, 14] = true;
-            adjacent[3, 15] = adjacent[15, 3] = true;
-            adjacent[15, 24] = adjacent[24, 15] = true;
+            //adjacent[1, 10] = adjacent[10, 1] = true;
+            //adjacent[10, 22] = adjacent[22, 10] = true;
+            //adjacent[4, 11] = adjacent[11, 4] = true;
+            //adjacent[11, 19] = adjacent[19, 11] = true;
+            //adjacent[7, 12] = adjacent[12, 7] = true;
+            //adjacent[12, 16] = adjacent[16, 12] = true;
+            //adjacent[2, 5] = adjacent[5, 2] = true;
+            //adjacent[5, 8] = adjacent[8, 5] = true;
+            //adjacent[17, 20] = adjacent[20, 17] = true;
+            //adjacent[20, 23] = adjacent[23, 20] = true;
+            //adjacent[9, 13] = adjacent[13, 9] = true;
+            //adjacent[13, 18] = adjacent[18, 13] = true;
+            //adjacent[6, 14] = adjacent[14, 6] = true;
+            //adjacent[14, 21] = adjacent[21, 14] = true;
+            //adjacent[3, 15] = adjacent[15, 3] = true;
+            //adjacent[15, 24] = adjacent[24, 15] = true;
 
             //for right now, the search will go 3 layers deep
             int newChildValue;
