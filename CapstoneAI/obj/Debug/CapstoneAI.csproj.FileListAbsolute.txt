@@ -1,0 +1,6 @@
+c:\users\kelly\documents\visual studio 2015\Projects\CapstoneAI\CapstoneAI\bin\Debug\CapstoneAI.exe.config
+C:\Users\Kelly\documents\visual studio 2015\Projects\CapstoneAI\CapstoneAI\bin\Debug\CapstoneAI.exe
+C:\Users\Kelly\documents\visual studio 2015\Projects\CapstoneAI\CapstoneAI\bin\Debug\CapstoneAI.pdb
+C:\Users\Kelly\documents\visual studio 2015\Projects\CapstoneAI\CapstoneAI\obj\Debug\CapstoneAI.csprojResolveAssemblyReference.cache
+C:\Users\Kelly\documents\visual studio 2015\Projects\CapstoneAI\CapstoneAI\obj\Debug\CapstoneAI.exe
+C:\Users\Kelly\documents\visual studio 2015\Projects\CapstoneAI\CapstoneAI\obj\Debug\CapstoneAI.pdb
